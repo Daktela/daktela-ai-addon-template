@@ -1,0 +1,57 @@
+[project]
+name = "daktela-ai-addon-template"
+version = "1.0.0"
+description = "Open-source starter template for building Daktela AI bot platform addons"
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "MIT" }
+
+dependencies = [
+    # The addon SDK. Everything an addon needs to speak the bot-platform
+    # protocol lives here: Module / Integration / DynamicList base classes,
+    # catalog discovery, the /manifest route and API-key security.
+    "cw-addons>=0.0.74",
+    "cw-utils",
+    "cw-logging",
+    # Web stack.
+    "fastapi[all]",
+    "uvicorn",
+    "httpx",
+    "loguru",
+    "dependency-injector",
+    # Level 2 (optional persistence). Pure-Python wheels; nothing here opens a
+    # connection until you set the db_* environment variables.
+    # See docs/11-persistence.md.
+    "cw-database",
+    "sqlmodel",
+    "sqlalchemy[asyncio]",
+    "alembic",
+    "psycopg[binary]",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "pytest-cov",
+    "coverage",
+    "ruff",
+    "pyright",
+    "aiosqlite",
+]
+
+[dependency-groups]
+dev = ["daktela-ai-addon-template[dev]"]
+
+# The addon SDK packages are published to a public Google Artifact Registry
+# index. It is readable anonymously - you do not need Daktela credentials.
+[tool.uv.sources]
+cw-addons = { index = "daktela-ai" }
+cw-utils = { index = "daktela-ai" }
+cw-database = { index = "daktela-ai" }
+cw-logging = { index = "daktela-ai" }
+
+[[tool.uv.index]]
+name = "daktela-ai"
+url = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/"
+explicit = true

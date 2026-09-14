@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - run: uv sync --all-extras
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Check formatting
+        run: uv run ruff format --check .
+
+      - name: Type-check
+        run: uv run pyright
+
+      # No services needed: the SQL settings store is exercised on in-memory
+      # SQLite. See unit_tests/conftest.py.
+      - name: Test
+        run: uv run pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+
+      # Node 26 no longer bundles Corepack; installing it keeps the pnpm
+      # version pinned by package.json's `packageManager` field.
+      - run: npm install -g corepack@latest && corepack enable
+
+      # The @coworkers scope (the shared theme) is served by a registry that is
+      # readable anonymously, see frontend/.npmrc - no credentials required.
+      - run: corepack pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: corepack pnpm lint
+
+      - name: Type-check
+        run: corepack pnpm typecheck
+
+      # Build first: tests/federationBundle.test.ts inspects the built bundle
+      # and is skipped when there is no build.
+      - name: Build the federated bundle
+        run: corepack pnpm build
+
+      - name: Test
+        run: corepack pnpm test

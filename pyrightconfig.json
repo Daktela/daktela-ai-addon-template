@@ -1,0 +1,7 @@
+{
+  "include": ["server"],
+  "exclude": ["**/__pycache__", ".venv", "frontend"],
+  "typeCheckingMode": "standard",
+  "reportMissingTypeStubs": false,
+  "pythonVersion": "3.13"
+}

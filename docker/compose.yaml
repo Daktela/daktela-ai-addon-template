@@ -1,0 +1,55 @@
+# Runs the addon the way production does.
+#
+#   docker compose -f docker/compose.yaml up --build addon         # full
+#   docker compose -f docker/compose.yaml up --build addon-basic   # modules only
+#
+# Run one or the other, not both at once against the same platform: they would
+# register under the same addon `code`.
+#
+# This is the level-1 (no database) configuration. To add Postgres, uncomment
+# the db service and the db_* variables - see docs/11-persistence.md.
+services:
+  # The full addon: modules plus the configuration page.
+  addon:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      API_KEYS: "default"
+      ADDON_SETTINGS_FILE: "/data/settings.json"
+      # db_host: db
+      # db_port: 5432
+      # db_name: addon_db
+      # db_username: addon_user
+      # db_password: addon_password
+    volumes:
+      - addon-data:/data
+
+  # The same source tree with no configuration page and no frontend build.
+  # The image already pins ADDON_PROFILE=basic; it is repeated here only so
+  # the difference is visible side by side.
+  addon-basic:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.basic
+    ports:
+      - "8001:8000"
+    environment:
+      API_KEYS: "default"
+      ADDON_PROFILE: "basic"
+      ADDON_SETTINGS_FILE: "/data/settings.json"
+    volumes:
+      - addon-basic-data:/data
+
+  # db:
+  #   image: postgres:18-alpine
+  #   environment:
+  #     POSTGRES_USER: addon_user
+  #     POSTGRES_PASSWORD: addon_password
+  #     POSTGRES_DB: addon_db
+
+volumes:
+  addon-data:
+  addon-basic-data:

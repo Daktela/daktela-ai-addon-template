@@ -1,0 +1,41 @@
+# Optional, not part of the required checks.
+#
+# The main CI runs the SQL store against SQLite, which proves the code works
+# but not that the Alembic migrations match the models. This workflow does,
+# against a real Postgres. Run it before a release, or on a schedule.
+name: Migration check
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * 1"
+
+jobs:
+  migrations:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_USER: addon_user
+          POSTGRES_PASSWORD: addon_password
+          POSTGRES_DB: addon_db
+        ports:
+          - 5442:5432
+        options: >-
+          --health-cmd "pg_isready -U addon_user -d addon_db"
+          --health-interval 5s --health-timeout 3s --health-retries 10
+    env:
+      db_host: localhost
+      db_port: 5442
+      db_name: addon_db
+      db_username: addon_user
+      db_password: addon_password
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --all-extras
+      - name: Apply migrations
+        run: uv run alembic upgrade head
+      - name: Fail if the models drifted from the migrations
+        run: uv run alembic check

@@ -1,0 +1,40 @@
+# Linting and formatting. Run `make lint` / `make format`.
+target-version = "py313"
+line-length = 120
+# `docs/` holds prose with illustrative snippets - deliberately partial and
+# hand-aligned, so the formatter must leave them alone.
+extend-exclude = [".venv", "migrations/versions", "frontend", "docs"]
+
+[lint]
+select = [
+    "E", "W",    # pycodestyle
+    "F",         # pyflakes
+    "I",         # import sorting
+    "UP",        # pyupgrade
+    "B",         # bugbear
+    "SIM",       # simplify
+    "ANN",       # type annotations
+    "RUF",       # ruff-specific
+]
+ignore = [
+    "ANN401",    # Any is occasionally the honest type
+    "B008",      # FastAPI dependencies are function calls in defaults by design
+    "E501",      # line length is handled by the formatter
+]
+
+[lint.per-file-ignores]
+# Catalog files are declarative. RUF012 would have you wrap every
+# `input_attributes = [...]` in ClassVar, which is exactly the noise a
+# template should spare its reader - the SDK declares them this way too.
+# RUF001/RUF003 fire on Czech text in the localised strings.
+"server/modules/catalog/*" = ["RUF001", "RUF003", "RUF012"]
+"server/integrations/catalog/*" = ["RUF001", "RUF003", "RUF012"]
+"server/dynamic_lists/catalog/*" = ["RUF001", "RUF003", "RUF012"]
+# Dependency-injector wiring puts Provide[...] in default arguments.
+"server/di.py" = ["B008"]
+"unit_tests/*" = ["ANN"]
+"migrations/env.py" = ["E402"]
+"server/main.py" = ["E402"]
+
+[format]
+quote-style = "double"

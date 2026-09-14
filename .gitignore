@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+frontend/dist/
+frontend/.cache/
+*.tsbuildinfo
+
+# Local configuration and state
+.env
+*.settings.json
+.addon-settings.json
+
+# Editors
+.idea/
+.vscode/
+
+# Generated on demand by `make orval` - regenerate rather than commit.
+frontend/src/gen/

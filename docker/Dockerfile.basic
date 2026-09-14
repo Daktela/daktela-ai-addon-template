@@ -1,0 +1,69 @@
+# Backend-only image: the addon without its configuration page.
+#
+# Same source tree as docker/Dockerfile, same Python environment, same
+# dependencies. Two differences, both marked in place below: there is no Node
+# stage, and ADDON_PROFILE is pinned to `basic`. See server/profile.py and
+# docs/13-deployment.md.
+#
+# Apart from those two, the stages below are line-for-line the same as stages 2
+# and 3 of docker/Dockerfile. Change one, change the other.
+
+# --- stage 1: the Python environment ---------------------------------------
+# `cw-database` depends on psycopg2, which is source-only, so this stage needs
+# a compiler and the Postgres client headers. They stay here - the runtime
+# image below gets the built virtualenv and nothing else.
+#
+# The basic profile keeps the settings store (the `tenant_settings` module
+# reads it at flow runtime), so the Postgres option exists in this image too
+# and these packages are exactly as necessary as in the full one.
+FROM python:3.13-slim AS builder
+WORKDIR /app
+
+ENV UV_COMPILE_BYTECODE=1 \
+    UV_LINK_MODE=copy
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
+
+# --- stage 2: the addon ----------------------------------------------------
+FROM python:3.13-slim AS runtime
+WORKDIR /app
+
+# ADDON_PROFILE is the reason this file exists. Without it the image would boot
+# the full profile, register GET /instance-configured, answer it 409 forever
+# (there is no configuration page, so nothing can ever write the settings) and
+# the platform would refuse to activate the addon.
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    ADDON_PROFILE=basic \
+    PATH="/app/.venv/bin:$PATH"
+
+# libpq5 is the runtime half of libpq-dev: psycopg2 links against it.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libpq5 \
+    && rm -rf /var/lib/apt/lists/* \
+    && useradd --create-home --uid 1000 addon
+
+COPY --from=builder /app/.venv /app/.venv
+
+# No `COPY --from=frontend /build/dist` here - that is the whole difference.
+COPY server/ ./server/
+COPY migrations/ ./migrations/
+COPY alembic.ini pyproject.toml ./
+
+# ADDON_SETTINGS_FILE usually points into /data. Creating it here means a
+# mounted volume inherits this ownership - otherwise the container runs as
+# `addon` and cannot write to a root-owned volume.
+RUN mkdir -p /data && chown -R addon:addon /app /data
+USER addon
+
+EXPOSE 8000
+
+# /liveness and /readiness are the probe targets - see server/health.py.
+CMD ["uvicorn", "server.main:app", "--host", "0.0.0.0", "--port", "8000"]

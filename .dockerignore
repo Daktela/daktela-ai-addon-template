@@ -1,0 +1,37 @@
+# Keep the build context small, and keep host-built artefacts out of the image.
+# Without this, `COPY frontend/ ./` would drop your machine's node_modules
+# (with its platform-specific binaries) on top of the ones installed in the
+# container, and the frontend build would fail in confusing ways.
+
+.git
+.github
+
+# Python
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+.coverage
+htmlcov
+
+# Node
+node_modules
+frontend/node_modules
+frontend/dist
+frontend/.cache
+*.tsbuildinfo
+
+# Local state and secrets
+.env
+*.settings.json
+.addon-settings.json
+
+# Editors
+.idea
+.vscode
+
+# Not needed at build time
+docs
+unit_tests
+docker-db

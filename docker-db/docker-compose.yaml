@@ -1,0 +1,24 @@
+# Development database for level-2 persistence. See docs/11-persistence.md.
+#
+#   docker compose -f docker-db/docker-compose.yaml up -d
+#
+# The credentials below match the db_* block in .env.example and the fallback
+# in migrations/env.py. They are development defaults - never reuse them
+# anywhere that matters.
+services:
+  postgres:
+    image: postgres:18-alpine
+    container_name: addon-template-db
+    environment:
+      POSTGRES_USER: addon_user
+      POSTGRES_PASSWORD: addon_password
+      POSTGRES_DB: addon_db
+    ports:
+      # Host port 5442, not 5432: a template should not fight with a Postgres
+      # you already run locally. The db_port in .env.example matches this.
+      - "5442:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U addon_user -d addon_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
