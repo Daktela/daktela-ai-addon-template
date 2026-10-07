@@ -10,7 +10,7 @@ dependencies = [
     # The addon SDK. Everything an addon needs to speak the bot-platform
     # protocol lives here: Module / Integration / DynamicList base classes,
     # catalog discovery, the /manifest route and API-key security.
-    "cw-addons>=0.0.74",
+    "cw-addons>=0.0.76",
     "cw-utils",
     "cw-logging",
     # Web stack.
