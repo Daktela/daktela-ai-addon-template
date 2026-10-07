@@ -10,6 +10,7 @@ EXPECTED_MODULES = {
     "hello_world",
     "exchange_rate",
     "interaction_event",
+    "email_draft",
     "tenant_settings",
     # Advanced examples - see docs/14-advanced.md.
     "streaming_echo",

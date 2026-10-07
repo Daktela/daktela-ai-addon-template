@@ -42,7 +42,7 @@ Read 1–6 in order the first time. After that, use it as a reference.
 ## Reference
 
 - [The addon manifest](reference/manifest.md) — every option in the `Settings(...)` block
-- [Input attributes](reference/attributes.md) — all ten types, their fields and gotchas
+- [Input attributes](reference/attributes.md) — all eleven types, their fields and gotchas
 - [What an addon returns](reference/actions.md) — actions, events and the other response shapes
 - [Environment variables](reference/env-vars.md) — every variable and its default
 - [HTTP API](reference/http-api.md) — every route, request and response shape

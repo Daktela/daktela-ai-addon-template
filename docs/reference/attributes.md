@@ -1,7 +1,7 @@
 # Reference: input attributes
 
 `input_attributes` on a module declares the form the flow designer fills in on the builder page. The
-list below is exhaustive — the builder renders these ten types and no others, and each type's fields
+list below is exhaustive — the builder renders these eleven types and no others, and each type's fields
 are all the configuration it has. There is no way to add a custom control.
 
 Import everything from `cw_addons.modules.models`. To see how these declarations turn into the
@@ -20,7 +20,7 @@ form a flow designer fills in, look at the annotated screenshot in
 
 `LangString(en="…", cs="…")` — both languages are required.
 
-## The ten types
+## The eleven types
 
 ### `NameAttribute`
 
@@ -64,7 +64,33 @@ Multi-line text area. Same fields as `StringAttribute`.
 |---|---|---|
 | `default_value` | `str \| None` | |
 
-Use it for prompts, templates, and anything a designer will paste a paragraph into.
+Use it for prompts, templates, and anything a designer will paste a paragraph into. The pencil icon
+beside the field opens a larger plain-text (Markdown) editor.
+
+### `HtmlAttribute`
+
+Rich text. Looks like `TextAreaAttribute`, but the pencil icon opens the builder's WYSIWYG editor —
+the same one the native *Send email* node uses for its message body. Same fields as
+`StringAttribute`.
+
+| Field | Type | Notes |
+|---|---|---|
+| `default_value` | `str \| None` | HTML. |
+
+Your attributes model receives an **HTML string**. Use it for email bodies and anything else that
+ends up rendered as HTML.
+
+```python
+HtmlAttribute(
+    name="body",
+    title=LangString(en="Body", cs="Tělo"),
+    description=LangString(en="Click the pencil to edit.", cs="Upravte kliknutím na tužku."),
+    default_value="<p>Hello,</p>",
+    required=True,
+)
+```
+
+Worked example: `server/modules/catalog/email_draft.py`.
 
 ### `NumberAttribute`
 
@@ -114,13 +140,14 @@ SelectAttribute(
 
 ### `StringListAttribute`
 
-A repeatable list of plain strings — "add another", with one text box each.
+A chips input: the designer types a value and presses Enter, and it becomes a chip. The same control
+the native *Send email* node uses for its recipients.
 
 | Field | Type | Notes |
 |---|---|---|
 | `default_value` | `list[str] \| None` | |
 
-Your attributes model receives a `list[str]`.
+Your attributes model receives a `list[str]`. Worked example: `server/modules/catalog/email_draft.py`.
 
 ### `ListAttribute`
 
@@ -132,7 +159,7 @@ A repeatable **group** of fields: one row per entry, several inputs per row.
 
 Nested entries may be `StringAttribute`, `StringListAttribute`, `BooleanAttribute`,
 `SelectAttribute` or `TextAreaAttribute`. **Not** another `ListAttribute`, and not
-`NumberAttribute`, `DynamicListAttribute` or `ToolsCallAttribute`.
+`NumberAttribute`, `HtmlAttribute`, `DynamicListAttribute` or `ToolsCallAttribute`.
 
 ```python
 ListAttribute(
@@ -192,6 +219,7 @@ class MyAttributes(BaseModel):
     name: str                     # NameAttribute
     greeting: str                 # StringAttribute
     prompt: str                   # TextAreaAttribute
+    body: str                     # HtmlAttribute (an HTML string)
     timeout_seconds: float        # NumberAttribute
     enabled: bool                 # BooleanAttribute
     severity: str                 # SelectAttribute
@@ -246,4 +274,4 @@ it in their pickers.
 | Renaming an attribute after the module is in use | Existing flows lose that value |
 | Adding a required attribute with no `default_value` | Existing flows break |
 | Changing attributes without bumping the module's `version` | The builder keeps showing the old form — see [chapter 5](../05-module-in-the-builder.md) |
-| Expecting a custom form control | Not supported. These ten types are all the builder renders |
+| Expecting a custom form control | Not supported. These eleven types are all the builder renders |

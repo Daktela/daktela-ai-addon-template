@@ -45,6 +45,7 @@ curl -H "X-Api-Key: default" http://localhost:8000/manifest
     { "name": "hello_world", "public": true, "...": "..." },
     { "name": "exchange_rate", "public": true, "...": "..." },
     { "name": "interaction_event", "public": true, "...": "..." },
+    { "name": "email_draft", "public": true, "...": "..." },
     { "name": "tenant_settings", "public": true, "...": "..." },
     { "name": "streaming_echo", "public": true, "supports_streaming": true },
     { "name": "local_tag", "public": true, "execution": "local" }

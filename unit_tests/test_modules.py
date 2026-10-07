@@ -9,6 +9,7 @@ import httpx
 import pytest
 from cw_addons.utils.test_helpers import DiscussionBuilder, dummy_tenant
 
+from server.modules.catalog.email_draft import EmailDraftAttributes, EmailDraftModule
 from server.modules.catalog.exchange_rate import ExchangeRateAttributes, ExchangeRateModule
 from server.modules.catalog.hello_world import HelloWorldAttributes, HelloWorldModule
 from server.modules.catalog.interaction_event import InteractionEventAttributes, InteractionEventModule
@@ -28,6 +29,20 @@ async def test_hello_world_sends_the_greeting() -> None:
     response = await module.execute()
 
     assert _actions_of(response, "message")[0].text == "Ahoj"
+    assert _actions_of(response, "output_port")[0].name == "done"
+
+
+async def test_email_draft_exposes_recipients_and_html_body() -> None:
+    module = EmailDraftModule(
+        attributes=EmailDraftAttributes(recipients=["a@example.com", "b@example.com"], body="<p>Hi</p>"),
+        discussion=DiscussionBuilder().build(),
+        tenant=dummy_tenant,
+    )
+
+    response = await module.execute()
+
+    contexts = {context.name: context.value for context in _actions_of(response, "context")[0].contexts}
+    assert contexts == {"email_recipients": "a@example.com, b@example.com", "email_body": "<p>Hi</p>"}
     assert _actions_of(response, "output_port")[0].name == "done"
 
 

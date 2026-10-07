@@ -63,7 +63,7 @@ Then:
 curl -H "X-Api-Key: default" http://localhost:8000/manifest
 ```
 
-You should see the addon's manifest listing six modules and one integration. Open
+You should see the addon's manifest listing seven modules and one integration. Open
 <http://localhost:8000/> for the interactive API docs.
 
 That is the whole addon running. Next: [docs/01-quickstart.md](docs/01-quickstart.md).
@@ -89,7 +89,7 @@ server/
   profile.py                basic or full - what this process exposes
   di.py                     where settings are stored (this is the database switch)
   settings/                 the one storage abstraction, with two implementations
-  modules/catalog/          six example flow-builder modules
+  modules/catalog/          seven example flow-builder modules
   integrations/catalog/     a tool the AI agent can call
   dynamic_lists/catalog/    a searchable option list
 frontend/

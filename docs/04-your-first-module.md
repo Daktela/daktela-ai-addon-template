@@ -105,7 +105,7 @@ They serve different purposes:
 Keep the names in sync. If they drift, the request validates fine and your attribute comes back as a
 missing field — a confusing bug worth avoiding by keeping the two blocks next to each other.
 
-The ten available attribute types are listed in [reference/attributes.md](reference/attributes.md).
+The eleven available attribute types are listed in [reference/attributes.md](reference/attributes.md).
 
 ## Output ports: how the flow continues
 

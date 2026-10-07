@@ -58,7 +58,7 @@ Restarting your addon is not enough on its own — the platform has to fetch the
 
 3. Drag it onto the canvas.
 4. The attribute form on the right is generated from `input_attributes` — you did not write that
-   form, and you cannot add custom controls to it. The ten attribute types
+   form, and you cannot add custom controls to it. The eleven attribute types
    ([reference](reference/attributes.md)) are all the builder renders.
 5. Wire the output ports. Every `OutputPortStatic` you declared is one arrow.
 
