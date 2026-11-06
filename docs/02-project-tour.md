@@ -79,7 +79,7 @@ One source tree, two shapes:
 | | `basic` | `full` |
 |---|---|---|
 | Modules, integrations, dynamic lists | ✔ | ✔ |
-| Settings store, `/liveness`, `/readiness`, `POST /api/register_addon` | ✔ | ✔ |
+| Settings store, `/liveness`, `/readiness`, `POST /api/register_addon`, `DELETE /api/instance` | ✔ | ✔ |
 | `/api/example_credentials`, `/openapi-frontend.json`, `/dist` | — | ✔ |
 | `GET /instance-configured` | — | ✔ |
 | `has_setting` in the manifest | `false` | `true` |
