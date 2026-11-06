@@ -17,6 +17,7 @@ All of them require `X-Api-Key`.
 | `POST` | `/dynamic_list/v1/{name}` | ✔ | Query a dynamic list. |
 | `POST` | `/api/register_addon` | ✔ | The addon was synced to an instance. Registered only if you pass `on_register_addon`. |
 | `GET` | `/instance-configured` | ✔ | Is this instance set up? 200 / 409. Registered only if you pass `on_check_configured` — **the `basic` profile does not**, because a 409 blocks activation. |
+| `DELETE` | `/api/instance` | ✔ | The instance was deleted for good: delete everything you store for this tenant. 204, also when there was nothing. Any exception becomes 500 (never 404 — the platform reads 404 as "no delete hook" and leaves your data behind). Registered only if you pass `on_delete_instance`. |
 
 ## Called by your own UI
 
@@ -111,9 +112,9 @@ POST /api/register_addon
 |---|---|---|
 | `X-Api-Key` | everything | `cw_addons.security.get_api_key` |
 | `X-Customer` | everything | `TenantDep`, `CWInstanceContext` |
-| `X-Bot-Url` | everything | `TenantDep` |
+| `X-Bot-Url` | everything | `TenantDep`, `DELETE /api/instance` |
 | `X-Instance-Id` | everything | `TenantDep`, `CWInstanceContext` |
-| `X-Instance-Name` | everything | `TenantDep` |
+| `X-Instance-Name` | everything | `TenantDep`, `DELETE /api/instance` |
 | `X-Discussion-Id`, `X-Message-Id`, `X-Request-Id`, `X-User-Token` | every call, for correlation | read them yourself if you need them |
 
 ## Status codes
@@ -121,6 +122,7 @@ POST /api/register_addon
 | Code | When |
 |---|---|
 | 200 | Fine |
+| 204 | `DELETE /api/instance`: the tenant's data is gone (or there was none) |
 | 403 | `X-Api-Key` missing or not in `API_KEYS` |
 | 404 | The resource does not exist (e.g. settings not saved yet) |
 | 409 | `GET /instance-configured`: the instance is not configured |
