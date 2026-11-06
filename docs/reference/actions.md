@@ -64,7 +64,7 @@ executor = ModuleExecutor(
 
 | Class | Fields | Meaning |
 |---|---|---|
-| `MessageAction` | `text`, `buttons: list[MessageButton]` | Send a chat message |
+| `MessageAction` | `text`, `buttons: list[MessageButton]`, optional `phase` | Send a chat message |
 | `ContextAction` | `contexts: list[ResultContext]` | Set context variables (`ResultContext(name, value)`) |
 | `StoreAction` | `store: dict[str, StoreValue]` | Write to the conversation store |
 | `OutputPortAction` | `name` | Take this output port |
@@ -165,3 +165,27 @@ OutputPortList(
 ```
 
 Your module fills `products` with `add_context`, and the designer wires each resulting arrow.
+
+## Assistant phase
+
+`MessageAction`, discussion `Message`, and streaming `ChunkEvent` accept optional
+`phase="commentary"` or `phase="final_answer"`. Omit it for legacy messages.
+Commentary is a customer-facing progress update; preserve it in history and in the
+final response, in emission order. It does not finish the user turn. A stream's
+`done=True` closes one message, while `FinalEvent` closes module execution.
+
+Emit zero or more separate commentary messages before the final answer. For example:
+
+```python
+yield ChunkEvent(delta="Checking availability.", done=True, phase="commentary")
+# Await your operation here.
+yield ChunkEvent(delta="A slot is available.", done=True, phase="final_answer")
+yield FinalEvent(module_response=ModuleResponses(actions=[
+    MessageAction(text="Checking availability.", phase="commentary"),
+    MessageAction(text="A slot is available.", phase="final_answer"),
+]))
+```
+
+Channel and model opt-in policy belongs to the consuming application. Do not send
+progress updates to email customers. The streaming echo example marks its single
+answer with `final_answer`.
