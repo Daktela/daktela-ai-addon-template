@@ -65,6 +65,7 @@ otherwise. Ship a Font Awesome name as the default and add the bitmap once you h
 | Field | Default | What it does |
 |---|---|---|
 | `has_setting` | `False` | Whether the addon has a configuration page. **This only puts the "Configure" button on the addon's card** — it does not gate the route, so an operator reaching the detail URL directly still makes the platform try to load your bundle. In this template it follows `ADDON_PROFILE` (see [chapter 13](../13-deployment.md)). |
+| `has_skills` | `False` | The SDK sets this to `True` when `ConfigurationService.configure_app` receives a `skills_provider`. The platform then fetches the tenant's public skill catalog from `/skills` during addon synchronization. This template enables it in both profiles. |
 | `has_widgets` | `False` | Reserved for chat-window widgets. **Nothing in the platform reads it yet** — leave it alone, and do not declare `widget`-type integrations ([chapter 8](../08-integrations-and-tool-calls.md)). |
 | `enabled_instance_types` | `[]` | Restrict to `chatbot`, `voicebot`, `emailbot`, `rbm`. Empty means all of them. If it excludes an instance's type, the addon syncs but never appears for that instance. |
 

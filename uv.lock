@@ -359,7 +359,7 @@ wheels = [
 
 [[package]]
 name = "cw-addons"
-version = "0.0.82"
+version = "0.0.83"
 source = { registry = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" }
 dependencies = [
     { name = "dependency-injector" },
@@ -370,9 +370,9 @@ dependencies = [
     { name = "tomlkit" },
     { name = "uvicorn" },
 ]
-sdist = { url = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/cw-addons/cw_addons-0.0.82.tar.gz", hash = "sha256:d53eb5d49ade76ecefabc11a33a0d91662ebc362488f915842dc9824c8c8ad1e" }
+sdist = { url = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/cw-addons/cw_addons-0.0.83.tar.gz", hash = "sha256:5e23c08ec1b5a64e4d3f975a99b1cf4ef3dc61ec7a18925b0b7111090f724e48" }
 wheels = [
-    { url = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/cw-addons/cw_addons-0.0.82-py3-none-any.whl", hash = "sha256:20c4179e21bddcc91811626df599269f0fe421bf68730959d0c005e9039e415d" },
+    { url = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/cw-addons/cw_addons-0.0.83-py3-none-any.whl", hash = "sha256:63a52198d84d02dba027c2b64f6df3e427978cd63091aa84b2d7a6a75d5dc5c2" },
 ]
 
 [[package]]
@@ -506,7 +506,7 @@ requires-dist = [
     { name = "aiosqlite", marker = "extra == 'dev'" },
     { name = "alembic" },
     { name = "coverage", marker = "extra == 'dev'" },
-    { name = "cw-addons", specifier = ">=0.0.82", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
+    { name = "cw-addons", specifier = ">=0.0.83", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-database", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-logging", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-utils", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },

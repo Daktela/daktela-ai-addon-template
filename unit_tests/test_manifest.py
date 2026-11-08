@@ -7,6 +7,7 @@ from server.app import create_app
 from server.di import Container
 
 EXPECTED_MODULES = {
+    "skill_catalog",
     "hello_world",
     "exchange_rate",
     "interaction_event",

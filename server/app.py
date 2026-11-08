@@ -51,6 +51,7 @@ from server.identity import addon_identity
 from server.profile import AddonProfile, addon_profile
 from server.settings.models import TenantKey
 from server.settings.store import SettingsStore
+from server.skills import get_skills
 
 FRONTEND_DIST = Path(__file__).resolve().parent.parent / "frontend" / "dist"
 
@@ -112,7 +113,7 @@ def create_app(container: Container) -> FastAPI:
         has_setting=is_full,
     )
 
-    ConfigurationService.configure_app(app=app, settings=settings)
+    ConfigurationService.configure_app(app=app, settings=settings, skills_provider=get_skills)
 
     # ------------------------------------------------------------------
     # 4. Activation lifecycle.

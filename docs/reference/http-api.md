@@ -10,6 +10,7 @@ All of them require `X-Api-Key`.
 | Method | Path | Generated | Purpose |
 |---|---|---|---|
 | `GET` | `/manifest` | ✔ | Everything the platform knows about your addon. ETag-cached. |
+| `GET` | `/skills` | ✔ | Public skills available to the requesting tenant. Registered when `skills_provider` is passed to `ConfigurationService.configure_app`; present in both template profiles. |
 | `GET` | `/module/v1/catalog` | ✔ | Just the modules. |
 | `POST` | `/module/v1/execute/{module_name}` | ✔ | Run a module. |
 | `POST` | `/module/v1/execute/{module_name}/stream` | ✔ | Server-Sent Events, for modules that implement `execute_streamed` — [chapter 14](../14-advanced.md). Absent for the rest. |
@@ -42,6 +43,25 @@ All of them require `X-Api-Key`.
 | `GET` | `/_codegen/v1/...` | A shadow OpenAPI app the SDK mounts so the platform can generate one shared client. Not yours to call. |
 
 ## Request shapes
+
+**Skill catalog**
+
+```json
+GET /skills
+{
+  "skills": [{
+    "key": "order_status",
+    "name": "Order status",
+    "load_when": "The customer asks about an order or its delivery.",
+    "instructions": "Ask for the order number if it is missing. Use order_lookup and explain its returned status without inventing delivery dates.",
+    "tools": ["order_lookup"]
+  }]
+}
+```
+
+Use the API key and tenant headers listed below. The tool names refer to this
+addon's integrations. See [chapter 8](../08-integrations-and-tool-calls.md#publish-an-integration-as-a-skill)
+for synchronization and agent opt-in.
 
 **Module execution**
 
