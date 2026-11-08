@@ -506,7 +506,7 @@ requires-dist = [
     { name = "aiosqlite", marker = "extra == 'dev'" },
     { name = "alembic" },
     { name = "coverage", marker = "extra == 'dev'" },
-    { name = "cw-addons", specifier = ">=0.0.81", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
+    { name = "cw-addons", specifier = ">=0.0.82", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-database", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-logging", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
     { name = "cw-utils", index = "https://europe-west3-python.pkg.dev/artin-chatbot/cw-addons-python/simple/" },
