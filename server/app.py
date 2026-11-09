@@ -15,9 +15,10 @@ Read this file first. It is the whole wiring of the addon in one screen:
    `/module/v1/execute/{name}`, `/integration/v1/execute/{name}`,
    `/dynamic_list/v1/{name}`. You never write those by hand, and both
    profiles get all of them - the modules are the point of the addon.
-4. `LifecycleService.register` adds the activation hooks:
-   `POST /api/register_addon` in both profiles, `GET /instance-configured`
-   only in `full`, for the reason spelled out at the call site.
+4. `LifecycleService.register` adds the lifecycle hooks:
+   `POST /api/register_addon` and `DELETE /api/instance` in both profiles,
+   `GET /instance-configured` only in `full`, for the reason spelled out at
+   the call site.
 5. The health probes, in both profiles.
 6. Last, in one block: everything that exists only in the `full` profile.
 """
@@ -28,6 +29,7 @@ from pathlib import Path
 from typing import Any
 
 from cw_addons.models import Settings
+from cw_addons.modules.models import Tenant
 from cw_addons.service.configuration_service import ConfigurationService
 from cw_addons.service.lifecycle_service import (
     AddonRegisterRequest,
@@ -126,6 +128,8 @@ def create_app(container: Container) -> FastAPI:
         # addon could never be activated. An absent route 404s instead, which
         # the platform reads as "nothing to configure here".
         on_check_configured=_check_configured if is_full else None,
+        # Both profiles store settings, so both must let the platform delete them.
+        on_delete_instance=_delete_instance,
     )
 
     # ------------------------------------------------------------------
@@ -207,6 +211,21 @@ async def _register_addon(
         sorted(request.env_config),
     )
     return AddonRegisterResponse(success=True)
+
+
+@inject
+async def _delete_instance(
+    tenant: Tenant,
+    store: SettingsStore = SettingsStoreProvider,
+) -> None:
+    """Answers `DELETE /api/instance`: the instance was deleted for good.
+
+    Delete *everything* this addon stores for the tenant, matched by its exact
+    key - never by prefix, one customer id can be the prefix of another. Having
+    nothing to delete is a success: the platform retries a failed purge, and
+    the SDK answers 204 either way. Raising makes the purge fail (500).
+    """
+    await store.delete(TenantKey(customer=tenant.customer, instance_id=tenant.instance_id))
 
 
 # ----------------------------------------------------------------------

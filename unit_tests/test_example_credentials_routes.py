@@ -79,3 +79,23 @@ def test_register_addon_acknowledges_the_sync(client: TestClient) -> None:
 
     assert response.status_code == 200
     assert response.json()["success"] is True
+
+
+def test_delete_instance_removes_only_this_tenants_settings(client: TestClient) -> None:
+    """The platform's purge hook. The other tenants share a prefix with the deleted one on purpose."""
+    longer_instance_id = {**TENANT_HEADERS, "X-Instance-Id": "10"}
+    longer_customer = {**TENANT_HEADERS, "X-Customer": "test-customer-2"}
+    for headers in (TENANT_HEADERS, longer_instance_id, longer_customer):
+        assert client.post("/api/example_credentials", headers=headers, json=PAYLOAD).status_code == 200
+
+    response = client.delete("/api/instance", headers=TENANT_HEADERS)
+
+    assert response.status_code == 204
+    assert client.get("/api/example_credentials", headers=TENANT_HEADERS).status_code == 404
+    assert client.get("/api/example_credentials", headers=longer_instance_id).status_code == 200
+    assert client.get("/api/example_credentials", headers=longer_customer).status_code == 200
+
+
+def test_delete_instance_is_idempotent(client: TestClient) -> None:
+    assert client.delete("/api/instance", headers=TENANT_HEADERS).status_code == 204
+    assert client.delete("/api/instance", headers=TENANT_HEADERS).status_code == 204

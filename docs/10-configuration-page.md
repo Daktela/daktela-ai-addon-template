@@ -254,16 +254,22 @@ The example settings page uses plain `addonAxios` and a hand-written zod schema,
 before you have generated anything. Once you have your own routes, switch the page over to the
 generated hooks — they are typed against the real schema.
 
-## `/instance-configured` and `/api/register_addon`
+## The lifecycle hooks
 
 ```python
-LifecycleService.register(app, on_register_addon=_register_addon, on_check_configured=_check_configured)
+LifecycleService.register(
+    app,
+    on_register_addon=_register_addon,
+    on_check_configured=_check_configured,
+    on_delete_instance=_delete_instance,
+)
 ```
 
 | Route | Called when | This template answers |
 |---|---|---|
 | `GET /instance-configured` | The operator activates the addon, and afterwards | `200` if the instance has credentials stored, `409` if not |
 | `POST /api/register_addon` | After the platform syncs the addon | `{"success": true}`, and logs the config keys |
+| `DELETE /api/instance` | The instance was deleted and its grace period ended | `204` after `store.delete(...)` for the tenant |
 
 `_register_addon` is where a real addon seeds settings from the platform's environment configuration:
 
@@ -278,6 +284,12 @@ This template only logs, so registering can never overwrite something an operato
 
 Supplying no callback is also valid — the SDK simply does not register that route, and the platform
 tolerates the 404.
+
+`_delete_instance` must delete **everything** your addon keeps for the tenant — every table, file and
+remote object — matched by the exact tenant key (`customer` + `instance_id`), never by a prefix. Make it
+idempotent: the platform retries a failed purge, so the second call finds nothing and must still succeed.
+An addon without `on_delete_instance` answers 404 and the platform reports it as a warning; if you store
+anything per tenant, implement it.
 
 ## Developing without the platform
 

@@ -100,6 +100,7 @@ Before pointing bot-platform at a deployed addon:
 - [ ] `GET /liveness` reports the profile you meant to deploy.
 - [ ] `/liveness` and `/readiness` wired to the orchestrator.
 - [ ] Migrations applied (if using Postgres).
+- [ ] If you store per-tenant data, implement `on_delete_instance` so `DELETE /api/instance` is registered.
 - [ ] Logs going somewhere you can read them.
 
 Then follow [chapter 3](03-connect-to-bot-platform.md), using your public URL instead of

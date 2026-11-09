@@ -203,3 +203,8 @@ def test_the_icon_defaults_to_font_awesome_only() -> None:
 
     assert manifest["fa_icon"] == "puzzle-piece"
     assert manifest["base64_icon"] is None
+
+
+def test_basic_registers_the_delete_hook(basic_app: FastAPI) -> None:
+    """Both profiles store settings, so both must let the platform delete them."""
+    assert "/api/instance" in _api_paths(basic_app)
