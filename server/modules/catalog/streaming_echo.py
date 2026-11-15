@@ -24,6 +24,7 @@ from typing import override
 from cw_addons.modules.executor import ModuleExecutor
 from cw_addons.modules.models import (
     LangString,
+    MessageAction,
     ModuleResponses,
     NumberAttribute,
     OutputContext,
@@ -135,14 +136,14 @@ class StreamingEchoModule(Module[StreamingEchoAttributes]):
 
         for piece in self._pieces():
             streamed.append(piece)
-            yield ChunkEvent(delta=piece)
+            yield ChunkEvent(delta=piece, phase="final_answer")
 
             if self.attributes.delay_ms:
                 await asyncio.sleep(self.attributes.delay_ms / 1000)
 
         # `done=True` marks the end of one logical message. A module that sends
         # several messages in a run emits one of these between them.
-        yield ChunkEvent(delta="", done=True)
+        yield ChunkEvent(delta="", done=True, phase="final_answer")
 
         yield FinalEvent(module_response=self._build_response("".join(streamed)))
 
@@ -159,7 +160,7 @@ class StreamingEchoModule(Module[StreamingEchoAttributes]):
             module_name=self.name,
         )
 
-        executor.add_message(text)
+        executor.actions.append(MessageAction(text=text, phase="final_answer"))
         executor.add_context("streamed_text", text)
         executor.add_output_port("done")
 

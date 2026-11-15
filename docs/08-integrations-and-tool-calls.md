@@ -122,6 +122,40 @@ curl -X POST localhost:8000/integration/v1/execute/order_lookup \
 { "response": { "order_id": "order-12345", "status": "in_transit", "estimated_delivery": "2026-09-19" }, "billing_info": [] }
 ```
 
+## Publish an integration as a skill
+
+A skill combines short selection instructions, a full workflow prompt and the
+integrations that workflow may call. This template publishes **Order status** from
+`server/skills.py`, backed by the existing `order_lookup` example integration.
+That integration returns demonstration data; replace it with your service before
+using the example for real customer orders.
+
+`create_app` passes `get_skills` to `ConfigurationService.configure_app`. The SDK
+advertises `has_skills` in the manifest and exposes authenticated `GET /skills`.
+The callback receives the tenant, so it can return the skills available to that
+instance. Keep a skill's `key` stable when changing its name or instructions.
+
+To try it in the platform:
+
+1. Register or synchronize this addon on your instance. Its **Order status** skill
+   appears in **Skills** with a link to the `order_lookup` integration.
+2. Open a standard LLM Agent in the builder and explicitly select **Order status**
+   in its skills field. Creating or synchronizing a skill does not enable it.
+3. Ask about an order, then supply its number. The agent loads the skill when
+   needed and calls its integration within the same conversation.
+
+An addon-owned skill is read-only in the platform. Synchronizing an updated
+definition with the same key updates that skill; an editable copy is independent.
+Keep private built-in agent skills out of the public catalog.
+
+For your own agent module, declare a `SkillsAttribute` and accept `SkillSummary`
+objects: `id`, `name`, `load_when`. The platform stores the selected IDs and passes
+only their summaries at first. An agent runtime must implement the `load_skill`
+round trip to obtain the full instructions and tools. The template's
+`skill_catalog` module only displays selected names to demonstrate this input
+contract; it is not an LLM agent. A skill may instruct an agent to load another
+skill, but that second skill must also be selected for the agent.
+
 ## Module or integration?
 
 | Question | Answer |

@@ -1,7 +1,7 @@
 # Reference: input attributes
 
 `input_attributes` on a module declares the form the flow designer fills in on the builder page. The
-list below is exhaustive — the builder renders these eleven types and no others, and each type's fields
+list below is exhaustive — the builder renders these twelve types and no others, and each type's fields
 are all the configuration it has. There is no way to add a custom control.
 
 Import everything from `cw_addons.modules.models`. To see how these declarations turn into the
@@ -20,7 +20,7 @@ form a flow designer fills in, look at the annotated screenshot in
 
 `LangString(en="…", cs="…")` — both languages are required.
 
-## The eleven types
+## The twelve types
 
 ### `NameAttribute`
 
@@ -236,6 +236,27 @@ ToolsCallAttribute(
 )
 ```
 
+### `SkillsAttribute`
+
+An opt-in multiselect of platform skills. The platform stores selected IDs and sends
+only `SkillSummary` objects (`id`, `name`, `load_when`) to the module. The full skill
+prompt and its tool definitions are loaded through `load_skill` when needed by an agent.
+See `server/modules/catalog/skill_catalog.py` for a metadata example; that example
+displays selected names and does not implement an LLM runtime.
+
+```python
+SkillsAttribute(name="skills", title=LangString(en="Skills", cs="Skilly"))
+```
+
+To provide public skills, pass an async tenant callback as `skills_provider` to
+`ConfigurationService.configure_app`. See `server/skills.py`: each `AddonSkill`
+has a stable `key`, `name`, `load_when`, `instructions` and a list of integration
+names in `tools`. The SDK exposes authenticated `GET /skills` using the standard
+tenant headers and advertises `has_skills` in the manifest. Return only the skills
+available to that tenant. Public addon skills are read-only in the platform; users
+may create independent editable copies. Publishing a skill never enables it in an
+agent automatically. Keep private built-in agent skills out of this callback.
+
 ## The matching pydantic model
 
 ```python
@@ -299,4 +320,4 @@ it in their pickers.
 | Renaming an attribute after the module is in use | Existing flows lose that value |
 | Adding a required attribute with no `default_value` | Existing flows break |
 | Changing attributes without bumping the module's `version` | The builder keeps showing the old form — see [chapter 5](../05-module-in-the-builder.md) |
-| Expecting a custom form control | Not supported. These eleven types are all the builder renders |
+| Expecting a custom form control | Not supported. These twelve types are all the builder renders |

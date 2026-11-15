@@ -46,6 +46,16 @@ async def test_the_last_chunk_closes_the_message() -> None:
     assert all(chunk.done is False for chunk in chunks[:-1])
 
 
+async def test_phase_agrees_between_chunks_and_final_message() -> None:
+    events = await _collect(_module())
+
+    chunks = [event for event in events if isinstance(event, ChunkEvent)]
+    final = events[-1]
+
+    assert [chunk.phase for chunk in chunks] == ["final_answer"] * 4
+    assert final.module_response.actions[0].phase == "final_answer"
+
+
 async def test_exactly_one_final_event_and_it_comes_last() -> None:
     events = await _collect(_module())
 

@@ -35,7 +35,7 @@ Server-Sent Events. Each frame is `data: <json>\n\n`, and the JSON is one of thr
 
 | Envelope | Fields | When |
 |---|---|---|
-| `ChunkEvent` | `delta: str`, `done: bool = False` | Zero or more, as text is produced |
+| `ChunkEvent` | `delta: str`, `done: bool = False`, optional `phase` | Zero or more, as text is produced |
 | `FinalEvent` | `module_response: ModuleResponses` | Exactly once, last |
 | `ErrorEvent` | `message: str`, `error_type: str` | Instead of the final event, if something raised |
 

@@ -39,6 +39,7 @@ Most addons are only modules. The configuration page is optional, so the templat
 | | `basic` | `full` |
 |---|---|---|
 | Flow-builder modules, integrations, dynamic lists | ✔ | ✔ |
+| Public skill catalog (`GET /skills`) | ✔ | ✔ |
 | A React configuration page | — | ✔ |
 | Needs Node to build | no | yes |
 | Image | `docker/Dockerfile.basic` | `docker/Dockerfile` |
@@ -63,7 +64,7 @@ Then:
 curl -H "X-Api-Key: default" http://localhost:8000/manifest
 ```
 
-You should see the addon's manifest listing seven modules and one integration. Open
+You should see the addon's manifest listing eight modules and one integration. Open
 <http://localhost:8000/> for the interactive API docs.
 
 That is the whole addon running. Next: [docs/01-quickstart.md](docs/01-quickstart.md).
@@ -87,9 +88,10 @@ That is a **development** shortcut only. A real addon runs on a server with its 
 server/
   app.py                    the whole wiring, in one screen
   profile.py                basic or full - what this process exposes
+  skills.py                 public skill catalog for agent opt-in
   di.py                     where settings are stored (this is the database switch)
   settings/                 the one storage abstraction, with two implementations
-  modules/catalog/          seven example flow-builder modules
+  modules/catalog/          eight example flow-builder modules
   integrations/catalog/     a tool the AI agent can call
   dynamic_lists/catalog/    a searchable option list
 frontend/

@@ -101,7 +101,16 @@ def test_basic_serves_every_module(basic_app: FastAPI) -> None:
     """Modules are the point of the basic image."""
     manifest = TestClient(basic_app).get("/manifest", headers={"X-Api-Key": "default"}).json()
 
-    assert len(manifest["modules"]) == 7
+    assert {module["name"] for module in manifest["modules"]} == {
+        "hello_world",
+        "exchange_rate",
+        "interaction_event",
+        "email_draft",
+        "tenant_settings",
+        "streaming_echo",
+        "local_tag",
+        "skill_catalog",
+    }
     assert manifest["has_setting"] is False
 
 
